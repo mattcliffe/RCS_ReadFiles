@@ -18,13 +18,13 @@ import matplotlib.pyplot as plt
 import binascii
 import numpy as np
 
-
-os.chdir(r'/home/mjayk/Documents/')
+path = r'/home/mjayk/Documents/RCS/UoHBoard/ReadFiles/RCS_ReadFiles'
+os.chdir(path)
 files = glob.glob('**.RCS')
 
 
 fname  = files[1]
-
+print(fname)
 with open(fname,"rb") as binary_file:
     dataraw = binary_file.read()
 
@@ -59,23 +59,25 @@ lmn = 0
 firstbit = 0
 while firstbit < len(dataraw)-packetlength:
     lmn = int(lmn)
-    firstbit = 28+(packetlength*lmn)+1
+    firstbit = 27+(packetlength*lmn)+1
     lastbit = firstbit+packetlength
     data = dataraw[firstbit:lastbit]
     data_s = binascii.b2a_hex(data).decode('utf-8')
 
 
-    if data[5] != 255:
-        p1.append(int(str(data[1] + data[0])))
-        p2.append(int(str(data[3] + data[2])))
-        p3.append(int(str(data[5] + data[4])))
+    if data[8] != 255:
+        p1.append(float(data[1]*2**8) + float(data[0]))
+        p2.append(float(data[3]*2**8) + float(data[2]))
+        p3.append(float(data[5]*2**8) + float(data[4]))
         
        # glitchcount.append(float(str(data[6])))   
         
         toffactor = 1/12e6
-        tof.append(int(str(data[7] + data[6]))*toffactor*1e6)
+        tof.append((float((data[7])*2**8 + (data[6])))/12)
     lmn = lmn+1
+    
 
+    #break 
 
 p1 = np.array(p1)
 p2 = np.array(p2)
@@ -98,42 +100,32 @@ for prq in np.linspace(0,len(tof)-1,len(tof)):
         else:
             ratio.append(p2[prq]/p1[prq])
 
-## plots
-#
-#plt.figure(1)
-#plt.cla()
-#plt.plot(p1,'r',label='Peak 1')
-#plt.plot(p2,'k',label='Peak 2')
-#plt.plot(p3,'b',label='Peak 3')
-#plt.plot(tof,'g',label='ToF uS')
-#plt.grid('on')
-#plt.legend(loc=1)
-#plt.title(dts)
 
-plt.figure(2)
-plt.subplot(221)
-plt.cla()
-plt.title('Time of flight')
-n, bins, patches = plt.hist(tof, bins=range(1,10)) 
-plt.plot(bins[0:-1] + 0.5, n)       
-
-
-plt.subplot(222)
-plt.cla()
-plt.title('Biref')
-n, bins, patches = plt.hist(p3) 
-plt.plot(bins[0:-1], n)
-
-plt.subplot(223)
-plt.cla()
-plt.title('Scat1 + Scat2')
-n,bins,patches = plt.hist(p1+p2)
-plt.plot(bins[0:-1],n)
-
-plt.subplot(224)
-plt.cla()
-plt.title('Scat ratio')
-n, bins, patches = plt.hist(ratio)
-plt.plot(bins[0:-1],n)
-
-
+if 1 == 1:
+    plt.figure(2)
+    plt.subplot(221)
+    plt.cla()
+    plt.title('Time of flight')
+#    n, bins, patches = plt.hist(tof, bins=range(1,10))
+    n, bins, patches = plt.hist(tof, bins=range(1,10))
+    plt.plot(bins[0:-1] + 0.5, n)       
+    
+    
+    plt.subplot(222)
+    plt.cla()
+    plt.title('Biref')
+    n, bins, patches = plt.hist(p3) 
+    plt.plot(bins[0:-1] + 0.5, n)
+    
+    plt.subplot(223)
+    plt.cla()
+    plt.title('Scat1')
+    n,bins,patches = plt.hist(p1)
+    plt.plot(bins[0:-1],n)
+    
+    plt.subplot(224)
+    plt.cla()
+    plt.title('Scat2')
+    n, bins, patches = plt.hist(p2)
+    plt.plot(bins[0:-1],n)
+    
