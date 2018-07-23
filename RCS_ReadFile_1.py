@@ -100,9 +100,11 @@ for prq in np.linspace(0,len(tof)-1,len(tof)):
         else:
             ratio.append(p2[prq]/p1[prq])
 
+ratio_n = ratio / np.max(ratio)
+p3_n = p3 / np.max(p3)
 
-if 1 == 1:
-    plt.figure(2)
+if 1 == 2:
+    plt.figure(1)
     plt.subplot(221)
     plt.cla()
     plt.title('Time of flight')
@@ -128,4 +130,16 @@ if 1 == 1:
     plt.title('Scat2')
     n, bins, patches = plt.hist(p2)
     plt.plot(bins[0:-1],n)
+
+if 1 == 1:
+    
+    plt.figure(2)
+    plt.clf()
+    plt.subplot(211)
+    n, bins, patches = plt.hist(tof, bins=range(0,10))
+    plt.plot(bins[0:-1] + 0.5, n)       
+    
+    plt.subplot(212)
+    n, bins, patches = plt.hist(ratio, bins = range(0,10))
+    plt.plot(bins[0:-1] + 0.5, n)     
     
